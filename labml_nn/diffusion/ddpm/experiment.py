@@ -240,7 +240,7 @@ def main():
     configs.init()
 
     # Set models for saving and loading
-    experiment.add_pytorch_models({'eps_model': configs.eps_model})
+    # experiment.add_pytorch_models({'eps_model': configs.eps_model})
 
     # Start and run the training loop
     with experiment.start():
