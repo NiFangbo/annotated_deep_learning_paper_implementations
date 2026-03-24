@@ -17,6 +17,7 @@ Save the images inside [`data/celebA` folder](#dataset_path).
 The paper had used a exponential moving average of the model with a decay of $0.9999$. We have skipped this for
 simplicity.
 """
+import os
 from typing import List
 
 import torchvision
@@ -79,6 +80,8 @@ class Configs(BaseConfigs):
     # Adam optimizer
     optimizer: torch.optim.Adam
 
+    writer: SummaryWriter
+
     def init(self):
         # Create $\textcolor{lightgreen}{\epsilon_\theta}(x_t, t)$ model
         self.eps_model = UNet(
@@ -103,7 +106,9 @@ class Configs(BaseConfigs):
         # Image logging
         # tracker.set_image("sample", True)
 
-        self.writer = SummaryWriter(log_dir=tracker.run_path)
+        log_dir = os.path.abspath('./logs')
+        self.writer = SummaryWriter(log_dir=log_dir)
+        print(f"TensorBoard log path: {log_dir}")
 
     def sample(self):
         """
@@ -122,10 +127,11 @@ class Configs(BaseConfigs):
                 x = self.diffusion.p_sample(x, x.new_full((self.n_samples,), t, dtype=torch.long))
 
             # Log samples
-            tracker.save('sample', x)
+            # tracker.save('sample', x)
 
             grid = vutils.make_grid(x, nrow=4, normalize=True, value_range=(-1, 1))
             self.writer.add_image('generated', grid, global_step=tracker.get_global_step())
+            self.writer.flush()
 
     def train(self):
         """
@@ -148,7 +154,7 @@ class Configs(BaseConfigs):
             # Take an optimization step
             self.optimizer.step()
             # Track the loss
-            tracker.save('loss', loss)
+            # tracker.save('loss', loss)
 
             self.writer.add_scalar('loss', loss, tracker.get_global_step())
 
