@@ -99,7 +99,7 @@ class Configs(BaseConfigs):
         self.optimizer = torch.optim.Adam(self.eps_model.parameters(), lr=self.learning_rate)
 
         # Image logging
-        tracker.set_image("sample", True)
+        # tracker.set_image("sample", True)
 
     def sample(self):
         """
@@ -247,6 +247,5 @@ def main():
         configs.run()
 
 
-#
 if __name__ == '__main__':
     main()
