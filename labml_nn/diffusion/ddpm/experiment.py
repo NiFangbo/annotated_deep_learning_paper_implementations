@@ -30,6 +30,8 @@ from labml_nn.diffusion.ddpm import DenoiseDiffusion
 from labml_nn.diffusion.ddpm.unet import UNet
 from labml_nn.helpers.device import DeviceConfigs
 
+from torch.utils.tensorboard import SummaryWriter
+import torchvision.utils as vutils
 
 class Configs(BaseConfigs):
     """
@@ -101,6 +103,8 @@ class Configs(BaseConfigs):
         # Image logging
         # tracker.set_image("sample", True)
 
+        self.writer = SummaryWriter(log_dir=tracker.run_path)
+
     def sample(self):
         """
         ### Sample images
@@ -119,6 +123,9 @@ class Configs(BaseConfigs):
 
             # Log samples
             tracker.save('sample', x)
+
+            grid = vutils.make_grid(x, nrow=4, normalize=True, value_range=(-1, 1))
+            self.writer.add_image('generated', grid, global_step=tracker.get_global_step())
 
     def train(self):
         """
@@ -142,6 +149,8 @@ class Configs(BaseConfigs):
             self.optimizer.step()
             # Track the loss
             tracker.save('loss', loss)
+
+            self.writer.add_scalar('loss', loss, tracker.get_global_step())
 
     def run(self):
         """
